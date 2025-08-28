@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { Prisma } from 'generated/prisma';
 
@@ -12,7 +12,7 @@ export class EmployeesController {
   }
 
   @Get()
-  findAll() {
+  findAll(@Query('role') role?:"INTERN" | "ENGINEER" | "ADMIN" ) {
     return this.employeesService.findAll();
   }
 
