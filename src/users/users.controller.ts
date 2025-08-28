@@ -43,7 +43,7 @@ export class UsersController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body()
+    @Body(ValidationPipe)
     updateUserDto: updateUserDTO,
   ) {
     return this.usersService.update(id, updateUserDto);

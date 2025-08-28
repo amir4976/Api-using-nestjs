@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createUserDTO } from './dto/create-user.dto';
 import { updateUserDTO } from './dto/update-user.dto';
-
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -10,7 +10,7 @@ export class UsersService {
       id: 1,
       name: 'Prisma1',
       email: 'prisma.gmail.com',
-      role: 'ENGINEER',
+      role: 'INTERN',
     },
     {
       id: 2,
@@ -38,17 +38,32 @@ export class UsersService {
     },
   ];
 
+
+
   findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
+    console.log(role)
     if (role) {
-      return this.user.filter((user) => user.role === role);
+      // so we filter by role and then check if the array is empty
+      // if it is empty then throw an exception 
+
+      const rolesArray = this.user.filter((user) => user.role === role);
+      if (!rolesArray.length) {
+        // Not found exeption is a built in exception
+        // and it return the massage for errormessage
+        throw new NotFoundException('user not found');
+      }
+      return rolesArray;
     }
     return this.user;
   }
 
+
+
+
   findOne(id: number) {
     const user = this.user.find((user) => user.id === id);
     if (!user) {
-      throw new Error(`User with id ${id} not found`);
+      throw new NotFoundException('user not found');
     }
     return user;
   }
@@ -63,27 +78,21 @@ export class UsersService {
     return newUser;
   }
 
-  update(
-    id: number,
-    updatedUser: updateUserDTO
-  ) {
-    this.user = this.user.map((user)=>{
-        if(user.id === id){
-            return {...user,...updatedUser}
-        }
-        return user;
-    })
+  update(id: number, updatedUser: updateUserDTO) {
+    this.user = this.user.map((user) => {
+      if (user.id === id) {
+        return { ...user, ...updatedUser };
+      }
+      return user;
+    });
     return this.findOne(id);
   }
 
-
-
-
-  delete(id:number){
+  delete(id: number) {
     const removeUser = this.findOne(id);
-    this.user =this.user.filter((user)=>{
-        return user.id !== id;
-    })
+    this.user = this.user.filter((user) => {
+      return user.id !== id;
+    });
     return removeUser;
   }
 }
